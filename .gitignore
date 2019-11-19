@@ -1,5 +1,6 @@
 # data
 data/*.csv
+data/*.xlsx
 
 # resources folder
 resources/*.jpeg

@@ -1,6 +1,9 @@
 # data
-data/*.csv
-data/*.xlsx
+data/processed/*.csv
+data/processed/*.xlsx
+
+data/raw/*.xlsx
+data/raw/*csv
 
 # resources folder
 resources/*.jpeg

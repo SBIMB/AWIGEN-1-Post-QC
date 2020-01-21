@@ -3,11 +3,11 @@ import pandas as pd
 from scripts import QC_Columns
 
 
-class Cardiovascular:
+class Health:
     def __init__(self):
         codeBook = QC_Columns.CodeBook()
         data_link = codeBook.get_data_link()
-        list_of_cols = codeBook.get_cardiovascular_cols()
+        list_of_cols = codeBook.get_health_cols()
 
         data = pd.read_csv(data_link,
                            usecols=list_of_cols,

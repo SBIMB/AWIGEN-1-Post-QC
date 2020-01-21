@@ -26,16 +26,25 @@ class Cardiovascular:
         self.soweto = df[5]
 
     def get_agincourt(self):
+        self.agincourt.fillna('Blank')
         return self.agincourt
 
     def get_dikgale(self):
+        self.dikgale.fillna('Blank')
         return self.dikgale
 
     def get_nairobi(self):
+        self.nairobi.fillna('Blank')
         return self.nairobi
 
     def get_nanoro(self):
+        self.nanoro.fillna('Blank')
+        return self.nanoro
+
+    def get_navrongo(self):
+        self.navrongo.fillna('Blank')
         return self.navrongo
 
     def get_soweto(self):
+        self.soweto.fillna('Blank')
         return self.soweto

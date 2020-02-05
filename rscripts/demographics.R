@@ -1,7 +1,10 @@
 #library
+library(ggplot2)
+#import data from imac
+#awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
 
-#import data
-awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
+# reading data from my pc
+awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
 
 
 # filtering out rows per site
@@ -16,7 +19,7 @@ demographics_cat <- c(
   "site",
   "region_qc",
   "sex",
-  "country",
+  "country_qc",
   "home_language",
   "ethnicity",
   "father_ethnicity",
@@ -109,12 +112,21 @@ demographics_num <- c("age",
 )
 
 # get the crosstabs for demographics
-function(df, column_list){
+demo_cat_freq <- function(df, column_list){
   for (cl in column_list) {
     print(cl)
-    print(table(df[, cl]))
+    df_table <- table(df[, cl])
+    print(df_table)
 
   }
 }
 
 demo_cat_freq(awigen, demographics_cat)
+
+bb <- barplot(table(awigen$country_qc), width = 0.85, 
+  main = "Sample Sizes of Various Fitness Traits", 
+  ylab = "Frequency")
+text(x = bb, y = dat$freqs, label = dat$freqs, pos = 3, cex = 0.8, col = "red")
+
+ggplot(awigen, aes(x = country_qc, y = age, fill = sex)) + geom_col(position = "dodge")
+

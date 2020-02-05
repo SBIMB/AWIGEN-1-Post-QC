@@ -1,10 +1,10 @@
 #library
 library(ggplot2)
 #import data from imac
-#awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
+awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
 
 # reading data from my pc
-awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
+#awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
 
 
 # filtering out rows per site
@@ -34,8 +34,9 @@ demographics_cat <- c(
   "mat_gfather_language",
   "mat_gmother_ethnicity",
   "mat_gmother_language",
-  "siblings",
-  "children",
+  "siblings_qc",
+  "children_qc",
+  "pregnant",
   "pregnant_qc",
   "regular_periods",
   "last_period_qc",
@@ -123,10 +124,31 @@ demo_cat_freq <- function(df, column_list){
 
 demo_cat_freq(awigen, demographics_cat)
 
-bb <- barplot(table(awigen$country_qc), width = 0.85, 
-  main = "Sample Sizes of Various Fitness Traits", 
-  ylab = "Frequency")
-text(x = bb, y = dat$freqs, label = dat$freqs, pos = 3, cex = 0.8, col = "red")
+bb <- barplot(table(awigen$last_period), 
+              width = 0.85, 
+              ylim=c(0,2700), 
+              main = "sites", 
+              ylab = "Count")
+text(x = bb, 
+     y = table(awigen$site), 
+     label = table(awigen$site), 
+     pos = 3, cex = 0.8, 
+     col = "black")
 
-ggplot(awigen, aes(x = country_qc, y = age, fill = sex)) + geom_col(position = "dodge")
+table(awigen$sex, awigen$marital_status_qc)
+aggregate(awigen$number_of_pregnancies_qc, list(awigen$pregnant), median, na.rm=TRUE)
+#ggplot(awigen, aes(x = country_qc, y = age, fill = sex)) + geom_col(position = "dodge")
+
+
+# plotting 3 categoricals
+awigen$marital_status_qc <- as.factor(awigen$marital_status_qc)
+awigen$sex <- as.factor(awigen$sex)
+awigen$site <- as.factor(awigen$site)
+cc <- ggplot(awigen, 
+       aes(marital_status_qc, ..count.., alpha=site), 
+       main = "marital status in sites per sex", 
+       xlab = "marital status") + 
+  geom_bar(aes(fill = sex), position = "dodge", colour="black")
+
+
 

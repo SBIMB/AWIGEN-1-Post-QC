@@ -1,6 +1,9 @@
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
+library(plyr)
+library(randomcoloR)
+library(dplyr)
 
 # allow bigger files to be imported 
 options(shiny.maxRequestSize=50*1024^2)
@@ -23,14 +26,6 @@ shinyServer(
       paste("Dataset has",r, "rows and",c,"columns", sep = " ")
     })
     
-    #sites in the file
-    # output$agincourt <- data()[ which(data()[,site == 1]),]
-    # output$digkale <- data()[ which(data()[,site == 2]),]
-    # output$nairobi <- data()[ which(data()[,site == 3]),]
-    # output$nanoro <- data()[ which(data()[,site == 4]),]
-    # output$navrongo <- data()[ which(data()[,site == 5]),]
-    # output$soweto <- data()[ which(data()[,site == 6]),]
-
     # display data sections
     output$launch_summary <- renderUI({
       if(is.null(data()))
@@ -53,8 +48,8 @@ shinyServer(
       df <- data()
       selectedColumn <- input$var
       bb <- barplot(table(df[,selectedColumn]), 
-                    width = 0.85, 
-                    ylim=c(0,2700), 
+                    width = 0.5, 
+                    ylim=c(0,12050), 
                     main = selectedColumn, 
                     ylab = "Count")
       text(x = bb, 
@@ -124,7 +119,9 @@ shinyServer(
       selectedVar1 <- input$hiv_var1
       selectedVar2 <- input$hiv_var2
       dff <- datasetInput()
-      table(dff[, selectedVar1], dff[, selectedVar2])
+      
+      f <- as.data.frame(table(dff[, selectedVar1], dff[, selectedVar2]))
+      f
       
     })
     
@@ -169,40 +166,110 @@ shinyServer(
           selectInput("measure2", "Choose variable",sort(sortby)))
     })
     
-    # render plot of measurements
+    # reactives for plotting measurements
+    # measures with -999
+    with_999 <- reactive({
+      if(is.null(data())){return()}
+      df <- data()
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      df[ which(df[, num_col] == -999), ]
+    })
     
-    num_var_summary <- function(df, num_col, site_names){
+    # print number of missing values per category
+    output$missing <- renderTable({
+      if(is.null(data())){return()}
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      as.data.frame(table(with_999()[, sortbyColumn], dnn = list(num_col)), responseName = "Count")
+    })
+    
+    # measures with no missing values
+    no_999 <- reactive({
+      if(is.null(data())){return()}
+      df <- data()
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      df[ which(df[, num_col] != -999), ]
+    })
+    
+    # print number of non missing values per category
+    output$not_missing <- renderTable({
+      if(is.null(data())){return()}
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      as.data.frame(table(no_999()[, sortbyColumn], dnn = list(num_col)), responseName = "Count")
+    })
+    
+    # means for measures
+    meanForMeasures <- reactive({
+      if(is.null(data())){return()}
+      df <- data()
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      data <- do.call("ddply",list(no_999(), sortbyColumn, summarize, aw_std.mean = call("mean",as.symbol(num_col),na.rm=TRUE)))
+      colnames(data) <- c(num_col, "Mean")
+      data
+    })
+    
+    # median for measures
+    medianForMeasures <- reactive({
+      if(is.null(data())){return()}
+      df <- data()
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      data <- do.call("ddply",list(no_999(), sortbyColumn, summarize, aw_std.median = call("median",as.symbol(num_col),na.rm=TRUE)))
+      colnames(data) <- c(num_col, "Median")
+      data
+    })
+    
+    # render statistics
+    output$stats_mean <- renderDataTable({
+      meanForMeasures()
+    })
+    output$stats_median <- renderDataTable({
+      medianForMeasures()
+    })
+    
+    
+    # outliers for measures
+    outliersForMeasures <- reactive({
+      if(is.null(data())){return()}
+      dataf <- no_999()
+      num_col <- input$measure1
+      outliers <- boxplot(dataf[, num_col], plot=FALSE)$out
+      no_999_outliers <- dataf[which(dataf[, num_col] %in% outliers),]
+    })
+    
+    # return the oupliers 
+    output$return_outliers <- renderDataTable({
+      if(is.null(data())){return()}
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      dataf <- outliersForMeasures()
+      select(dataf, sortbyColumn, num_col)
       
-      # checking -999 values: missing values
-      with_999 <- df[ which(df[, num_col] == -999), ]
-      print("Printing the number of missing values per site")
-      print(data.frame(table(with_999[, site_names])))
+    })
+    
+    # render plot of measurements
+    output$plot_measurements <- renderPlot({
+      if(is.null(data())){return()}
+      no_999 <- no_999()
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
       
+      # make the chosen column a factor
+      no_999[,sortbyColumn] <- as.factor(no_999[,sortbyColumn])
       
-      # removing -999 values
-      no_999 <- df[ which(df[, num_col] != -999), ]
-      print("Printing the count of non missing values per site")
-      print(data.frame(table(no_999[, site_names])))
-      print(summary(no_999[, site_names]))
+      # get groupby column to be used as fill in the plot
+      fillColumn <- no_999[, sortbyColumn]
       
-      
-      # getting the mean per site
-      mu_mean <- do.call("ddply",list(no_999, site_names, summarize, aw_std.mean = call("mean",as.symbol(num_col),na.rm=TRUE)))
-      print("printing the means")
-      print(head(mu_mean))
-      
-      
-      # getting the medians per site
-      mu_median <- do.call("ddply",list(no_999, site_names, summarize, aw_std.median = call("median",as.symbol(num_col),na.rm=TRUE)))
-      print("printing the medians per site")
-      print(head(mu_median))
-      
-      # getting the outliers
-      outliers <- boxplot(no_999[, num_col], plot=FALSE)$out
-      no_999_outliers <- no_999[which(no_999[, num_col] %in% outliers),]
-      print("printing the outliers")
-      print(data.frame(table(no_999_outliers[, site_names])))
-      theme_prefered = theme(
+      # randomly generate the colors to be used in the plot based on the mean categories
+      nColors <- nrow(meanForMeasures())
+      paletteColors <- distinctColorPalette(nColors)
+
+      # define the theme -- static
+      theme_prefered <-  theme(
         plot.title = element_text(color="black", size=18),
         axis.title.x = element_text(color="black", size=18),
         axis.title.y = element_text(color="black", size=18),
@@ -213,21 +280,15 @@ shinyServer(
         axis.line = element_line(colour = "black")
       )
       
-      plt <- ggplot(no_999, aes(x=no_999[,num_col], color=site_names, fill=site_names)) +
+      ggplot(no_999, aes(x=no_999[,num_col], color=sortbyColumn, fill=fillColumn)) +
         geom_histogram(aes(y=..density..), position="identity", alpha=0.5, bins = 30)+
         geom_density(alpha=0.6)+
-        geom_vline(data=mu_mean, aes(xintercept=aw_std.mean, color=site_names),
-                   linetype="dashed")+
-        geom_vline(data=mu_median, aes(xintercept=aw_std.median, color=site_names),
-                   linetype="solid")+
-        scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#de97da", "#e3948d", "#ecedb7"))+
-        scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#de97da", "#e3948d", "#ecedb7"))+
+        scale_color_manual(values=paletteColors)+
+        scale_fill_manual(values=paletteColors)+
         labs(title= paste(num_col, "histogram", sep=" "), x=num_col, y = "Density")+
         theme_prefered
       
-      print(plt)
-      
-    }
+    })
     # others ..
     
     

@@ -136,8 +136,22 @@ shinyUI(
                         ),
                     column(width=6,
                            fluidRow(
+                              tabsetPanel(type="tabs",
+                                          tabPanel("Missing", tableOutput("missing")),
+                                          tabPanel("Not Missing", tableOutput("not_missing")),
+                                          tabPanel("Plot", plotOutput("plot_measurements")),
+                                          tabPanel("Mean", dataTableOutput("stats_mean")),
+                                          tabPanel("Median", dataTableOutput("stats_median")),
+                                          tabPanel("Outliers", dataTableOutput("return_outliers"))
+                                          )
+                             # 
+                             # tabsetPanel(type="tabs",
+                             #             tabPanel("Hllo"))
+                           ),
+                           fluidRow(
                              uiOutput("measurement_columns")
-                           ))
+                           )
+                           )
                    )
                  
 

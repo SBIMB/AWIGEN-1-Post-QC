@@ -1,10 +1,12 @@
 library(ggplot2)
 library(plyr)
+library(readxl)
 #import data from imac
 #awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
 
 # reading data from my pc
-awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
+awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
+
 
 # Assign real site names
 site_labels <- c("Agincourt", "Digkale", "Nairobi", "Nanoro", "Navrongo", "Soweto")
@@ -17,6 +19,12 @@ nairobi <- awigen[ which(awigen$site == 3),]
 nanoro <- awigen[ which(awigen$site == 4),]
 navrongo <- awigen[ which(awigen$site == 5),]
 soweto <- awigen[ which(awigen$site == 6),]
+
+# a_with_999 <- agincourt[ -which(agincourt$standing_height_qc == -999), ]
+# summary(a_with_999$standing_height_qc)
+# outliers <- boxplot(a_with_999$standing_height_qc, plot=FALSE)$out
+# no_999_outliers <- a_with_999[which(a_with_999$standing_height_qc %in% outliers),]
+# View(no_999_outliers$standing_height_qc)
 
 measurememts <- c("standing_height_qc",
                   "weight_qc",
@@ -85,18 +93,17 @@ hiv_cat_freq <- function(df, column_list){
   }
 }
 
-hiv_cat_freq(soweto_bara, hiv_cols)
+hiv_cat_freq(nairobi, hiv_cols)
 
 # comparing two categorical columns
-table(soweto_men$hiv_positive_qc, soweto_men$agree_hivtest_qc)
+table(nairobi$tested_hiv_qc, nairobi$result_hiv_qc)
 
 # checking if the ids from the dataset below belong to soweto
-library(xlsx)
-copy_sweet <- read_excel("~/Downloads/Copy of Sweet HIV Testing (2).xlsx")
-ids <- copy_sweet$`Study ID`
-bara <- soweto_bara[soweto_bara$study_id %in% ids,  ]
-sweet <- soweto_sweet[soweto_sweet$study_id %in% ids,  ]
-men <- soweto_men[soweto_men$study_id %in% ids,  ]
+# copy_sweet <- read_excel("~/Downloads/Copy of Sweet HIV Testing (2).xlsx")
+# ids <- copy_sweet$`Study ID`
+# bara <- soweto_bara[soweto_bara$study_id %in% ids,  ]
+# sweet <- soweto_sweet[soweto_sweet$study_id %in% ids,  ]
+# men <- soweto_men[soweto_men$study_id %in% ids,  ]
 
 num_var_summary <- function(df, num_col, site_names){
 
@@ -104,7 +111,8 @@ num_var_summary <- function(df, num_col, site_names){
   with_999 <- df[ which(df[, num_col] == -999), ]
   print("Printing the number of missing values per site")
   print(data.frame(table(with_999[, site_names])))
-  print(" ")
+
+  
   # removing -999 values
   no_999 <- df[ which(df[, num_col] != -999), ]
   print("Printing the count of non missing values per site")
@@ -129,6 +137,25 @@ num_var_summary <- function(df, num_col, site_names){
   print("printing the outliers")
   print(data.frame(table(no_999_outliers[, site_names])))
   
+  # categories outliers per site
+  # agincourt_outliers <- no_999_outliers[ which(no_999_outliers[, site_names] == "agincourt"),]
+  # digkale_outliers <- no_999_outliers[ which(no_999_outliers[, site_names] == "digkale"),]
+  # nairobi_outliers  <- no_999_outliers[ which(no_999_outliers[, site_names] == "nairobi"),]
+  # nanoro_outliers  <- no_999_outliers[ which(no_999_outliers[, site_names] == "nanoro"),]
+  # navrongo_outliers  <- no_999_outliers[ which(no_999_outliers[, site_names] == "navrongo"),]
+  # soweto_outliers  <- no_999_outliers[ which(no_999_outliers[, site_names] == "soweto"),]
+  # print("printing outliers per site")
+  # print(agincourt_outliers)
+  
+  
+  
+  
+  # a_with_999 <- agincourt[ -which(agincourt$standing_height_qc == -999), ]
+  # summary(a_with_999$standing_height_qc)
+  # outliers <- boxplot(a_with_999$standing_height_qc, plot=FALSE)$out
+  # no_999_outliers <- a_with_999[which(a_with_999$standing_height_qc %in% outliers),]
+  # View(no_999_outliers$standing_height_qc)
+  # 
   # plotting using ggplot
   theme_prefered = theme(
     plot.title = element_text(color="black", size=18),
@@ -157,5 +184,5 @@ num_var_summary <- function(df, num_col, site_names){
   
 }
 
-num_var_summary(awigen, "weight_qc", "site_names")
+num_var_summary(awigen, "waist_circumference_qc", "site_names")
 

@@ -169,6 +169,65 @@ shinyServer(
           selectInput("measure2", "Choose variable",sort(sortby)))
     })
     
+    # render plot of measurements
+    
+    num_var_summary <- function(df, num_col, site_names){
+      
+      # checking -999 values: missing values
+      with_999 <- df[ which(df[, num_col] == -999), ]
+      print("Printing the number of missing values per site")
+      print(data.frame(table(with_999[, site_names])))
+      
+      
+      # removing -999 values
+      no_999 <- df[ which(df[, num_col] != -999), ]
+      print("Printing the count of non missing values per site")
+      print(data.frame(table(no_999[, site_names])))
+      print(summary(no_999[, site_names]))
+      
+      
+      # getting the mean per site
+      mu_mean <- do.call("ddply",list(no_999, site_names, summarize, aw_std.mean = call("mean",as.symbol(num_col),na.rm=TRUE)))
+      print("printing the means")
+      print(head(mu_mean))
+      
+      
+      # getting the medians per site
+      mu_median <- do.call("ddply",list(no_999, site_names, summarize, aw_std.median = call("median",as.symbol(num_col),na.rm=TRUE)))
+      print("printing the medians per site")
+      print(head(mu_median))
+      
+      # getting the outliers
+      outliers <- boxplot(no_999[, num_col], plot=FALSE)$out
+      no_999_outliers <- no_999[which(no_999[, num_col] %in% outliers),]
+      print("printing the outliers")
+      print(data.frame(table(no_999_outliers[, site_names])))
+      theme_prefered = theme(
+        plot.title = element_text(color="black", size=18),
+        axis.title.x = element_text(color="black", size=18),
+        axis.title.y = element_text(color="black", size=18),
+        axis.text = element_text(color="black", size=16),
+        legend.text = element_text(color="black", size=18),
+        legend.title = element_text(color="black", size=18),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black")
+      )
+      
+      plt <- ggplot(no_999, aes(x=no_999[,num_col], color=site_names, fill=site_names)) +
+        geom_histogram(aes(y=..density..), position="identity", alpha=0.5, bins = 30)+
+        geom_density(alpha=0.6)+
+        geom_vline(data=mu_mean, aes(xintercept=aw_std.mean, color=site_names),
+                   linetype="dashed")+
+        geom_vline(data=mu_median, aes(xintercept=aw_std.median, color=site_names),
+                   linetype="solid")+
+        scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#de97da", "#e3948d", "#ecedb7"))+
+        scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#de97da", "#e3948d", "#ecedb7"))+
+        labs(title= paste(num_col, "histogram", sep=" "), x=num_col, y = "Density")+
+        theme_prefered
+      
+      print(plt)
+      
+    }
     # others ..
     
     

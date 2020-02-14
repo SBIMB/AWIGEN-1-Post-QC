@@ -124,53 +124,45 @@ shinyUI(
         
         # measurements
         tabItem( tabName = "measurements",
-                 fluidRow(
-                   column(width=6,
-                          fixedPanel(width = "45%",
-                                     fluidRow(
-                                       tabsetPanel(type="tab",
-                                                   tabPanel("Crosstabs",uiOutput("hiv_columns"), tableOutput("crosstabs")),
-                                                   tabPanel("Plot"),
-                                                   tabPanel("Per site"))
-                                     ),
-                                     fluidRow(
-                                       
-                                       # h2("You're looking at measurements"),
-                                       #uiOutput("hiv_columns")
-                                     ),
-                                     fluidRow(
-                                       #tableOutput("crosstabs")
-                                     )
-                          )
+                 fluidRow(class="row1",
+                          
+                   column(6,
+                           tabBox(height = "550px",width = "250px",
+                                       tabPanel("Crosstabs",uiOutput("hiv_columns"), tableOutput("crosstabs")),
+                                       tabPanel("Plot"),
+                                       tabPanel("Per site"))
 
                         ),
-                    column(width=6,
-                           fixedPanel(width="50%", right=30, 
-                             fluidRow(
-                               tabsetPanel(type="tabs",
-                                           tabPanel("Missing", tableOutput("missing")),
-                                           tabPanel("Not Missing", tableOutput("not_missing")),
-                                           tabPanel("Plot", plotOutput("plot_measurements")),
-                                           tabPanel("Mean", dataTableOutput("stats_mean")),
-                                           tabPanel("Median", dataTableOutput("stats_median")),
-                                           tabPanel("Summary", verbatimTextOutput("summary_of_selected_measurement")),
-                                           tabPanel("Outliers", dataTableOutput("return_outliers"))
-                               )
-                           )
+                    column(6,
+                           tabBox(height = "550px", width = "250px",
+                                       tabPanel("Missing", tableOutput("missing")),
+                                       tabPanel("Not Missing", tableOutput("not_missing")),
+                                       tabPanel("Plot", plotOutput("plot_measurements")),
+                                       tabPanel("Mean", dataTableOutput("stats_mean")),
+                                       tabPanel("Median", dataTableOutput("stats_median")),
+                                       tabPanel("Summary", verbatimTextOutput("summary_of_selected_measurement")),
+                                       tabPanel("Outliers", dataTableOutput("return_outliers"))
+                       
+                                      )
 
+                      )
+                   ),
+                  fluidRow(class="row2",
+                    column(6, 
+                           tabBox(height = "550px",width = "250px",
+                                  tabPanel("Select columns", "3")
+                                  )
                            ),
-                           tags$div(class="container",
-                           fluidRow(
-                             fixedPanel(width="30%", bottom = 100,
-                               uiOutput("measurement_columns")
-                             )
-                             
+                    column(6,
+                           tabBox(height = "550px",width = "250px",
+                           tabPanel("Columns", uiOutput("measurement_columns"))
                            )
-                           )
-                   )
-                 
-
-        ),
+                           ),
+                 tags$head(tags$style("
+                  .row1{height:50%;}
+                  .row2{height:50%;}"
+                 ))
+        )),
         
         # calcultations
         tabItem( tabName = "calcultations",
@@ -179,10 +171,7 @@ shinyUI(
                  )
                  
         )
-
-
-      )
+     )
     )
-    
   )
 )

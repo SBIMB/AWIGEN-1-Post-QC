@@ -1,11 +1,12 @@
 library(ggplot2)
 library(plyr)
 library(readxl)
+
 #import data from imac
-#awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.23.csv", header=TRUE)
+awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
 
 # reading data from my pc
-awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
+#awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
 
 
 # Assign real site names
@@ -20,12 +21,7 @@ nanoro <- awigen[ which(awigen$site == 4),]
 navrongo <- awigen[ which(awigen$site == 5),]
 soweto <- awigen[ which(awigen$site == 6),]
 
-# a_with_999 <- agincourt[ -which(agincourt$standing_height_qc == -999), ]
-# summary(a_with_999$standing_height_qc)
-# outliers <- boxplot(a_with_999$standing_height_qc, plot=FALSE)$out
-# no_999_outliers <- a_with_999[which(a_with_999$standing_height_qc %in% outliers),]
-# View(no_999_outliers$standing_height_qc)
-
+# list of columns for measurements
 measurememts <- c("standing_height_qc",
                   "weight_qc",
                   "waist_circumference_qc",
@@ -62,7 +58,8 @@ hiv_cols <- c("tested_hiv_qc",
               "hiv_medication_qc",
               "traditional_med_hiv_qc",
               "agree_hivtest",
-              "result_hiv_qc")
+              "result_hiv_qc",
+              "hiv_final_status_c")
 
 # create age groups 
 agincourt$age_group <- cut(agincourt$age, 
@@ -71,22 +68,15 @@ agincourt$age_group <- cut(agincourt$age,
                            labels = c("40-60","61-70","71 plus"))
 
 
-# code for testing age groups created 
-# ages <- agincourt %>%
-#   select(age, age_group)
-# change the age value to see where it belongs
-# testing <- ages[ which(ages$age== 71),]
-# View(testing)
+# subsetting agincourt data according to age groups
+agincourt_40_60 <- agincourt[ which(agincourt$age_group == "40-60"),]
+agincourt_61_70 <- agincourt[ which(agincourt$age_group == "61-70"),]
+agincourt_71_Plus <- agincourt[ which(agincourt$age_group == "71 plus"),]
 
 # categorizing soweto data
 soweto_sweet <- soweto[ which(soweto$cohort_id_c == "SWEET"),]
 soweto_bara <- soweto[ which(soweto$cohort_id_c == "BARA"),]
 soweto_men<- soweto[ which(soweto$cohort_id_c == ""),]
-
-
-#categories for men in nairobi
-nairobi_male<- nairobi[ which(nairobi$sex == 1),]
-nairobi_female<- nairobi[ which(nairobi$sex == 0),]
 
 # get the crosstabs for hiv
 hiv_cat_freq <- function(df, column_list){
@@ -100,11 +90,15 @@ hiv_cat_freq <- function(df, column_list){
 
 hiv_cat_freq(nairobi, hiv_cols)
 
+# pivot table for multiple columns
+mytable <- xtabs(~ tested_hiv_qc+hiv_positive_qc+agree_hivtest_qc+result_hiv_qc+hiv_final_status_c, data=digkale)
+ftable(mytable)
+table(digkale$hiv_final_status_c)
+
 # comparing two categorical columns
-table(nairobi$hiv_final_status_c)
-table(nairobi$hiv_status_qc, nairobi$agree_hivtest_qc)
+table(nairobi$hiv_positive_qc, nairobi$hiv_positive_qc)
 
-
+# plotting numerical variables
 num_var_summary <- function(df, num_col, site_names){
 
   # checking -999 values: missing values

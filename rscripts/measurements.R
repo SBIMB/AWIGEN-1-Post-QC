@@ -83,6 +83,11 @@ soweto_sweet <- soweto[ which(soweto$cohort_id_c == "SWEET"),]
 soweto_bara <- soweto[ which(soweto$cohort_id_c == "BARA"),]
 soweto_men<- soweto[ which(soweto$cohort_id_c == ""),]
 
+
+#categories for men in nairobi
+nairobi_male<- nairobi[ which(nairobi$sex == 1),]
+nairobi_female<- nairobi[ which(nairobi$sex == 0),]
+
 # get the crosstabs for hiv
 hiv_cat_freq <- function(df, column_list){
   for (cl in column_list) {
@@ -96,14 +101,9 @@ hiv_cat_freq <- function(df, column_list){
 hiv_cat_freq(nairobi, hiv_cols)
 
 # comparing two categorical columns
-table(nairobi$tested_hiv_qc, nairobi$result_hiv_qc)
+table(nairobi$hiv_final_status_c)
+table(nairobi$hiv_status_qc, nairobi$agree_hivtest_qc)
 
-# checking if the ids from the dataset below belong to soweto
-# copy_sweet <- read_excel("~/Downloads/Copy of Sweet HIV Testing (2).xlsx")
-# ids <- copy_sweet$`Study ID`
-# bara <- soweto_bara[soweto_bara$study_id %in% ids,  ]
-# sweet <- soweto_sweet[soweto_sweet$study_id %in% ids,  ]
-# men <- soweto_men[soweto_men$study_id %in% ids,  ]
 
 num_var_summary <- function(df, num_col, site_names){
 

@@ -126,30 +126,45 @@ shinyUI(
         tabItem( tabName = "measurements",
                  fluidRow(
                    column(width=6,
-                          fluidRow(
-                            h2("You're looking at measurements"),
-                            uiOutput("hiv_columns")
-                          ),
-                          fluidRow(
-                            tableOutput("crosstabs")
+                          fixedPanel(width = "45%",
+                                     fluidRow(
+                                       tabsetPanel(type="tab",
+                                                   tabPanel("Crosstabs",uiOutput("hiv_columns"), tableOutput("crosstabs")),
+                                                   tabPanel("Plot"),
+                                                   tabPanel("Per site"))
+                                     ),
+                                     fluidRow(
+                                       
+                                       # h2("You're looking at measurements"),
+                                       #uiOutput("hiv_columns")
+                                     ),
+                                     fluidRow(
+                                       #tableOutput("crosstabs")
+                                     )
                           )
+
                         ),
                     column(width=6,
-                           fluidRow(
-                              tabsetPanel(type="tabs",
-                                          tabPanel("Missing", tableOutput("missing")),
-                                          tabPanel("Not Missing", tableOutput("not_missing")),
-                                          tabPanel("Plot", plotOutput("plot_measurements")),
-                                          tabPanel("Mean", dataTableOutput("stats_mean")),
-                                          tabPanel("Median", dataTableOutput("stats_median")),
-                                          tabPanel("Outliers", dataTableOutput("return_outliers"))
-                                          )
-                             # 
-                             # tabsetPanel(type="tabs",
-                             #             tabPanel("Hllo"))
+                           fixedPanel(width="50%", right=30, 
+                             fluidRow(
+                               tabsetPanel(type="tabs",
+                                           tabPanel("Missing", tableOutput("missing")),
+                                           tabPanel("Not Missing", tableOutput("not_missing")),
+                                           tabPanel("Plot", plotOutput("plot_measurements")),
+                                           tabPanel("Mean", dataTableOutput("stats_mean")),
+                                           tabPanel("Median", dataTableOutput("stats_median")),
+                                           tabPanel("Summary", verbatimTextOutput("summary_of_selected_measurement")),
+                                           tabPanel("Outliers", dataTableOutput("return_outliers"))
+                               )
+                           )
+
                            ),
+                           tags$div(class="container",
                            fluidRow(
-                             uiOutput("measurement_columns")
+                             fixedPanel(width="30%", bottom = 100,
+                               uiOutput("measurement_columns")
+                             )
+                             
                            )
                            )
                    )

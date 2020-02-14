@@ -224,11 +224,21 @@ shinyServer(
     })
     
     # render statistics
+    #n return the summary also
     output$stats_mean <- renderDataTable({
       meanForMeasures()
     })
+    
     output$stats_median <- renderDataTable({
       medianForMeasures()
+    })
+    
+    output$summary_of_selected_measurement <- renderPrint({
+      if(is.null(data())){return()}
+      df <- no_999()
+      num_col <- input$measure1
+      sortbyColumn <- input$measure2
+      summary(df[,num_col])
     })
     
     

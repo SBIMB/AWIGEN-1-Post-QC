@@ -74,9 +74,10 @@ shinyServer(
           cro(df[,selection[1]])
         }else if(length(selection)==2){
           cro(df[,selection[1]], df[,selection[2]])
+        }else if(length(selection)==3){
+          cro(df[,selection[1]], df[,selection[2]], df[,selection[3]])
         }else{
-          shinyalert("Oops!", "Try not more than 2 variables", type = "error")
-          
+          print("Cannot print")
         }
         
       }
@@ -93,6 +94,8 @@ shinyServer(
           bar_plot_1(df, selection[1])
         }else if(length(selection)==2){
           bar_plot_2(df, selection[1], selection[2])
+        }else if(length(selection)==3){
+          bar_plot_3(df, selection[1], selection[2], selection[3])
         }else{
           shinyalert("Oops!", "Try not more than 2 variables", type = "error")
         }

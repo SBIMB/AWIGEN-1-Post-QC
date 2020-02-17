@@ -23,19 +23,19 @@ shinyUI(
       # side bar menu items
       sidebarMenu(
         
-      # data here..
-      menuItem("Data", tabName = "imported_data"),
-
-      # Instruments here ...
-      menuItem("Demographic Information", tabName = "demographics"),
-      menuItem("Behaviour Lifestyle", tabName = "lifestyle"),
-      menuItem("Health history", tabName = "health"),
-      menuItem("Family history", tabName = "family"),
-      menuItem("Exposure", tabName = "exposure"),
-      menuItem("Infection history", tabName = "infection"),
-      menuItem("Cardiovascular Disease Risk",  tabName = "cardiovascular"),
-      menuItem("Measurements", tabName = "measurements"),
-      menuItem("Calculations", tabName = "calcultations")
+        # data here..
+        menuItem("Data", tabName = "imported_data"),
+        
+        # Instruments here ...
+        menuItem("Demographic Information", tabName = "demographics"),
+        menuItem("Behaviour Lifestyle", tabName = "lifestyle"),
+        menuItem("Health history", tabName = "health"),
+        menuItem("Family history", tabName = "family"),
+        menuItem("Exposure", tabName = "exposure"),
+        menuItem("Infection history", tabName = "infection"),
+        menuItem("Cardiovascular Disease Risk",  tabName = "cardiovascular"),
+        menuItem("Measurements", tabName = "measurements"),
+        menuItem("Calculations", tabName = "calcultations")
       )
       
       
@@ -49,22 +49,22 @@ shinyUI(
         # data
         tabItem( tabName = "imported_data",
                  fluidRow(style='height:40vh',
-                   column(width=6,
-                          uiOutput("launch_summary"),
-                          uiOutput("launch_columns")
+                          column(width=6,
+                                 uiOutput("launch_summary"),
+                                 uiOutput("launch_columns")
                           ),
-                   column(width=6,
-                          fluidRow(
-                            plotOutput("chart_preview")
-                            
-                          ),
-                          fluidRow(
-                            
-                            tableOutput("descriptive")
+                          column(width=6,
+                                 fluidRow(
+                                   plotOutput("chart_preview")
+                                   
+                                 ),
+                                 fluidRow(
+                                   
+                                   tableOutput("descriptive")
+                                 )
+                                 
                           )
-                     
-                   )
-                   
+                          
                  )
                  
         ),
@@ -74,7 +74,7 @@ shinyUI(
                  fluidRow(
                    h2(" demo here ..")
                  )
-
+                 
         ),
         
         # lifestyle
@@ -127,65 +127,63 @@ shinyUI(
         
         # measurements
         tabItem( tabName = "measurements",
+                 # variable sections
                  fluidRow(
                    box(title="Categoricals", width = 6, background = "black"),
                    box(title = "Numericals", width = 6, background = "light-blue")
-                          ),
+                 ),
+                 # top row
                  fluidRow(
-                          
+                   
                    column(6,
-                           tabBox(height = "550px",width = "250px",
-                                       tabPanel("Crosstabs",
-                                                fluidRow(
-                                                  column(6,
-                                                         selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE)
-                                                  ),
-                                                  column(6,
-                                                         selectInput("m_categorical2","Choose:", c(group_by))
-                                                  )
-                                                ),
-                                                hr(),
-                                                verbatimTextOutput("crosstab_summary")),
-                                       tabPanel("Plot",
-                                                fluidRow(
-                                                  column(6,
-                                                         selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE)
-                                                         ),
-                                                  column(6,
-                                                         selectInput("m_categorical2","Choose:", c(group_by))
-                                                         )
-                                                ),
-                                                hr(),
-                                                plotOutput("measurement_bar_plot")),
-                                       tabPanel("Per site"))
-
-                        ),
-                    column(6,
-                           tabBox(height = "550px", width = "250px",
-                                       tabPanel("Missing", tableOutput("missing")),
-                                       tabPanel("Not Missing", tableOutput("not_missing")),
-                                       tabPanel("Plot", plotOutput("plot_measurements")),
-                                       tabPanel("Mean", dataTableOutput("stats_mean")),
-                                       tabPanel("Median", dataTableOutput("stats_median")),
-                                       tabPanel("Summary", verbatimTextOutput("summary_of_selected_measurement")),
-                                       tabPanel("Outliers", dataTableOutput("return_outliers"))
-                       
-                                      )
-
-                      )
+                          tabBox(height = "600px",width = "250px",
+                                 tabPanel("Variables",
+                                            selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE),
+                                            hr(),
+                                            selectInput("m_categorical2","Choose:", c(group_by))
+                                 ),
+                                 tabPanel("Crosstabs",
+                                          div(style = 'overflow-y:scroll;height:500px;',
+                                              verbatimTextOutput("crosstab_summary"))
+                                 ),
+                                 tabPanel("Plot", plotOutput("measurement_bar_plot")),
+                                  tabPanel("Per site")
+                                 
+                          )
                    ),
-                  fluidRow(
-                    column(6, 
-                           tabBox(height = "550px",width = "250px",
-                                  tabPanel("Select columns", "3")
-                                  )
-                           ),
-                    column(6,
-                           tabBox(height = "550px",width = "250px",
-                           tabPanel("Columns", uiOutput("measurement_columns"))
-                           )
-                           )
-        )),
+                   column(6,
+                          tabBox(height = "600px", width = "250px",
+                                 tabPanel("Variables", uiOutput("measurement_columns")),
+                                 tabPanel("Missing", tableOutput("missing")),
+                                 tabPanel("Not Missing", tableOutput("not_missing")),
+                                 tabPanel("Plot", plotOutput("plot_measurements")),
+                                 tabPanel("Mean", dataTableOutput("stats_mean")),
+                                 tabPanel("Median", dataTableOutput("stats_median")),
+                                 tabPanel("Summary", verbatimTextOutput("summary_of_selected_measurement")),
+                                 tabPanel("Outliers",
+                                          div(style = 'overflow-y:scroll;height:500px;',
+                                              dataTableOutput("return_outliers")
+                                          )
+                                 )
+                                 
+                          )
+                          
+                   )
+                 ),
+                 # bottom row
+                 fluidRow(
+                   column(6, 
+                          tabBox(height = "600px",width = "250px",
+                                 tabPanel("Select columns", "3")
+                          )
+                   ),
+                   column(6,
+                          tabBox(height = "600px",width = "250px",
+                                 tabPanel("Columns")
+                          )
+                   )
+                 )
+        ),
         
         # calcultations
         tabItem( tabName = "calcultations",
@@ -194,7 +192,7 @@ shinyUI(
                  )
                  
         )
-     )
+      )
     )
   )
 )

@@ -4,6 +4,10 @@ library(ggplot2)
 library(plyr)
 library(randomcoloR)
 library(dplyr)
+library(plotly)
+library(expss)
+source('measurements.R')
+source('plots.R')
 
 # allow bigger files to be imported 
 options(shiny.maxRequestSize=50*1024^2)
@@ -47,17 +51,7 @@ shinyServer(
       if(is.null(data())){return()}
       df <- data()
       selectedColumn <- input$var
-      bb <- barplot(table(df[,selectedColumn]), 
-                    width = 0.5, 
-                    ylim=c(0,12050), 
-                    main = selectedColumn, 
-                    ylab = "Count")
-      text(x = bb, 
-           y = table(df[,selectedColumn]), 
-           label = table(df[,selectedColumn]), 
-           pos = 3, cex = 0.8, 
-           col = "black")
-      
+      bar_plot_1(df, selectedColumn)
     })
     
     # render table of stats
@@ -68,102 +62,52 @@ shinyServer(
       table(df[,selectedColumn])
     })
     
-    # measurements
-    output$hiv_columns <- renderUI({
-       hiv_cols <- c("tested_hiv_qc",
-                     "hiv_status_qc",
-                     "hiv_positive_qc",
-                     "hiv_medication_qc",
-                     "traditional_med_hiv_qc",
-                     "agree_hivtest",
-                     "result_hiv_qc")
-      
-      if(is.null(data())){return()}
-      box(title = "Select columns for crosstabs", status = "primary", solidHeader = T,
-          selectInput("hiv_var1", "Choose variable",sort(hiv_cols)),
-          selectInput("hiv_var2", "Choose variable",sort(hiv_cols)),
-          radioButtons("chosenSite", label = h3("Choose site"),
-                       choices = list("Agincourt" = 1, 
-                                      "Digkale" = 2, 
-                                      "Nairobi" = 3,
-                                      "Nanoro" = 4,
-                                      "Navrongo" =5,
-                                      "Soweto" = 6,
-                                      "All sites" = 7))
-          )
-    })
-    
-    # filter rows according to selected site
-    # returns site data
-    datasetInput <- reactive({
+    # measurements ___________
+    # crosstab section
+    # crostab tables
+    output$crosstab_summary <- renderPrint({
       if(is.null(data())){return()}
       df <- data()
-      cl <- "site"
-      clickedBtn <- input$chosenSite
+      selection <- input$m_categorical1
+      if (!is.null(selection)) {
+        if(length(selection)==1){
+          cro(df[,selection[1]])
+        }else if(length(selection)==2){
+          cro(df[,selection[1]], df[,selection[2]])
+        }else{
+          shinyalert("Oops!", "Try not more than 2 variables", type = "error")
+          
+        }
+        
+      }
       
-       switch (clickedBtn,
-         "1" = df[which(df[, cl] == 1),],
-         "2" = df[which(df[, cl] == 2),],
-         "3" = df[which(df[, cl] == 3),],
-         "4" = df[which(df[, cl] == 4),],
-         "5" = df[which(df[, cl] == 5),],
-         "6" = df[which(df[, cl] == 6),],
-         "7" = data()
-       )
     })
-    
-    # get crosstabs    
-    output$crosstabs <- renderTable({
+    # crosstab plots
+    # bar plot for measurements
+    output$measurement_bar_plot <- renderPlot({
       if(is.null(data())){return()}
-      
-      selectedVar1 <- input$hiv_var1
-      selectedVar2 <- input$hiv_var2
-      dff <- datasetInput()
-      
-      f <- as.data.frame(table(dff[, selectedVar1], dff[, selectedVar2]))
-      f
-      
+      df <- data()
+      selection <- input$m_categorical1
+      if (!is.null(selection)) {
+        if(length(selection)==1){
+          bar_plot_1(df, selection[1])
+        }else if(length(selection)==2){
+          bar_plot_2(df, selection[1], selection[2])
+        }else{
+          shinyalert("Oops!", "Try not more than 2 variables", type = "error")
+        }
+        
+      }
     })
     
+    # numericals
     # get distribution of hiv numeric variables
     output$measurement_columns <- renderUI({
-      num_cols <- c("standing_height_qc",
-                      "weight_qc",
-                      "waist_circumference_qc",
-                      "hip_circumference_qc",
-                      "bp_sys_average_qc",
-                      "bp_dia_average_qc",
-                      "pulse_average_qc",
-                      "visceral_fat_qc",
-                      "subcutaneous_fat_qc",
-                      "min_cimt_right",
-                      "max_cimt_right",
-                      "mean_cimt_right",
-                      "mean_cimt_right_qc",
-                      "min_cimt_left",
-                      "max_cimt_left",
-                      "mean_cimt_left",
-                      "mean_cimt_left_qc",
-                      "fasting_confirmation_qc",
-                      "glucose_qc",
-                      "s_creatinine_qc",
-                      "insulin_qc",
-                      "hdl_qc",
-                      "ldl_qc",
-                      "cholesterol_1_qc",
-                      "triglycerides_qc",
-                      "ur_creatinine_qc",
-                      "ur_albumin_qc",
-                      "ur_protein_qc")
-      
-      sortby <- c("sex",
-                  "country",
-                  "site")
       
       if(is.null(data())){return()}
       box(title = "Select numeric here ", status = "primary", solidHeader = T,
-          selectInput("measure1", "Choose variable",sort(num_cols)),
-          selectInput("measure2", "Choose variable",sort(sortby)))
+          selectInput("measure1", "Choose variable",sort(measurements_num_cols)),
+          selectInput("measure2", "Choose variable",sort(group_by)))
     })
     
     # reactives for plotting measurements
@@ -299,6 +243,11 @@ shinyServer(
         theme_prefered
       
     })
+    
+    
+    
+    
+    
     # others ..
     
     

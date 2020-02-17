@@ -1,5 +1,8 @@
 library(shiny)
 library(shinydashboard)
+library(plotly)
+library(shinyalert)
+source('measurements.R')
 
 shinyUI(
   dashboardPage(
@@ -124,12 +127,36 @@ shinyUI(
         
         # measurements
         tabItem( tabName = "measurements",
-                 fluidRow(class="row1",
+                 fluidRow(
+                   box(title="Categoricals", width = 6, background = "black"),
+                   box(title = "Numericals", width = 6, background = "light-blue")
+                          ),
+                 fluidRow(
                           
                    column(6,
                            tabBox(height = "550px",width = "250px",
-                                       tabPanel("Crosstabs",uiOutput("hiv_columns"), tableOutput("crosstabs")),
-                                       tabPanel("Plot"),
+                                       tabPanel("Crosstabs",
+                                                fluidRow(
+                                                  column(6,
+                                                         selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE)
+                                                  ),
+                                                  column(6,
+                                                         selectInput("m_categorical2","Choose:", c(group_by))
+                                                  )
+                                                ),
+                                                hr(),
+                                                verbatimTextOutput("crosstab_summary")),
+                                       tabPanel("Plot",
+                                                fluidRow(
+                                                  column(6,
+                                                         selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE)
+                                                         ),
+                                                  column(6,
+                                                         selectInput("m_categorical2","Choose:", c(group_by))
+                                                         )
+                                                ),
+                                                hr(),
+                                                plotOutput("measurement_bar_plot")),
                                        tabPanel("Per site"))
 
                         ),
@@ -147,7 +174,7 @@ shinyUI(
 
                       )
                    ),
-                  fluidRow(class="row2",
+                  fluidRow(
                     column(6, 
                            tabBox(height = "550px",width = "250px",
                                   tabPanel("Select columns", "3")
@@ -157,11 +184,7 @@ shinyUI(
                            tabBox(height = "550px",width = "250px",
                            tabPanel("Columns", uiOutput("measurement_columns"))
                            )
-                           ),
-                 tags$head(tags$style("
-                  .row1{height:50%;}
-                  .row2{height:50%;}"
-                 ))
+                           )
         )),
         
         # calcultations

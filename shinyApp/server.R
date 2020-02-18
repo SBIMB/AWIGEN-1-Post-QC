@@ -7,6 +7,7 @@ library(dplyr)
 library(plotly)
 library(expss)
 source('measurements.R')
+source('tab-modules.R')
 source('plots.R')
 
 # allow bigger files to be imported 

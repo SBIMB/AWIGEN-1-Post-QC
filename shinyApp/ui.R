@@ -3,6 +3,7 @@ library(shinydashboard)
 library(plotly)
 library(shinyalert)
 source('measurements.R')
+source('tab-modules.R')
 
 shinyUI(
   dashboardPage(
@@ -71,6 +72,7 @@ shinyUI(
         
         # demographics
         tabItem( tabName = "demographics",
+                 sectionLabels(),
                  fluidRow(
                    h2(" demo here ..")
                  )
@@ -79,6 +81,7 @@ shinyUI(
         
         # lifestyle
         tabItem( tabName = "lifestyle",
+                 sectionLabels(),
                  fluidRow(
                    h2(" lifestyle  here ..")
                  )
@@ -87,6 +90,7 @@ shinyUI(
         
         # health
         tabItem( tabName = "health",
+                 sectionLabels(),
                  fluidRow(
                    h2(" health here ..")
                  )
@@ -95,6 +99,7 @@ shinyUI(
         
         # family
         tabItem( tabName = "family",
+                 sectionLabels(),
                  fluidRow(
                    h2(" family here ..")
                  )
@@ -103,6 +108,7 @@ shinyUI(
         
         # exposure
         tabItem( tabName = "exposure",
+                 sectionLabels(),
                  fluidRow(
                    h2("exposure here ..")
                  )
@@ -111,6 +117,7 @@ shinyUI(
         
         # infection
         tabItem( tabName = "infection",
+                 sectionLabels(),
                  fluidRow(
                    h2("infection here ..")
                  )
@@ -119,35 +126,32 @@ shinyUI(
         
         # cardiovascular
         tabItem( tabName = "cardiovascular",
-                 fluidRow(
-                   h2(" cardio here ..")
-                 )
+                 sectionLabels()
+                 
                  
         ),
         
         # measurements
         tabItem( tabName = "measurements",
                  # variable sections
-                 fluidRow(
-                   box(title="Categoricals", width = 6, background = "black"),
-                   box(title = "Numericals", width = 6, background = "light-blue")
-                 ),
+                 sectionLabels(),
                  # top row
                  fluidRow(
                    
                    column(6,
                           tabBox(height = "600px",width = "250px",
                                  tabPanel("Variables",
-                                            selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE),
-                                            hr(),
-                                            selectInput("m_categorical2","Choose:", c(group_by))
+                                          helpText("Select one or 3 variables here"),
+                                          selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE),
+                                          hr(),
+                                          selectInput("m_categorical2","Choose:", c(group_by))
                                  ),
                                  tabPanel("Crosstabs",
                                           div(style = 'overflow-y:scroll;height:500px;',
                                               verbatimTextOutput("crosstab_summary"))
                                  ),
                                  tabPanel("Plot", plotOutput("measurement_bar_plot")),
-                                  tabPanel("Per site")
+                                 tabPanel("Per site")
                                  
                           )
                    ),
@@ -174,12 +178,12 @@ shinyUI(
                  fluidRow(
                    column(6, 
                           tabBox(height = "600px",width = "250px",
-                                 tabPanel("Select columns", "3")
+                                 tabPanel("Variable", "Still under development")
                           )
                    ),
                    column(6,
                           tabBox(height = "600px",width = "250px",
-                                 tabPanel("Columns")
+                                 tabPanel("Variable")
                           )
                    )
                  )
@@ -187,6 +191,7 @@ shinyUI(
         
         # calcultations
         tabItem( tabName = "calcultations",
+                 sectionLabels(),
                  fluidRow(
                    h2("calculations here ..")
                  )

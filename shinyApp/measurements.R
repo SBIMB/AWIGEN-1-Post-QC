@@ -1,3 +1,5 @@
+library(hash)
+
 # choose dataset
 site_data <- c("All", "Agincourt", "Digkale", "Nairobi", "Nanoro", "Navrongo", "Soweto")
 
@@ -40,8 +42,7 @@ measurements_cat_cols <- c("tested_hiv_qc",
                             "traditional_med_hiv_qc",
                             "agree_hivtest",
                             "result_hiv_qc",
-                            "menopause_status_c_qc",
-                            "sex")
+                            "hiv_final_status_c")
 
 
 # choose groupby attribute
@@ -51,4 +52,21 @@ group_by <- c("sex",
 
 
 # refer to the codebook labels
+measurements_hash <- hash()
+ls_1 <- list("1" = "Yes", "0" = "No", "2" = "Don't know",
+        "3" = "Refuse to answer", "-999" = "Missing")
+
+ls_2 <- list("1" = "Yes", "0" = "No", "2" = "Don't know",
+             "3" = "Refuse to answer", "-999" = "Missing", "-555"="Not Applicable")
+
+ls_3 <- list("1" = "Yes", "0" = "No", "2" = "NA", "-999" = "Missing")
+
+measurements_hash[["tested_hiv_qc"]] = ls_1
+measurements_hash[["hiv_status_qc"]] = ls_2
+measurements_hash[["hiv_positive_qc"]] = ls_2
+measurements_hash[["hiv_medication_qc"]] = ls_2
+measurements_hash[["traditional_med_hiv_qc"]] = ls_2
+measurements_hash[["agree_hivtest"]] = list("1" = "Yes", "0" = "No")
+measurements_hash[["result_hiv_qc"]] = ls_3
+measurements_hash[["hiv_final_status_c"]] = ls_3
 

@@ -2,6 +2,7 @@ library(shiny)
 library(shinydashboard)
 library(plotly)
 library(shinyalert)
+source('demographics.R')
 source('measurements.R')
 source('tab-modules.R')
 
@@ -70,11 +71,67 @@ shinyUI(
                  
         ),
         
-        # demographics
+        # demographics ------------------------------------------------------------------------------
         tabItem( tabName = "demographics",
                  sectionLabels(),
+                 # top row
                  fluidRow(
-                   h2(" demo here ..")
+                   
+                   column(6,
+                          tabBox(height = "600px",width = "250px",
+                                 tabPanel("Variables",
+                                          helpText("Select one or 3 variables here"),
+                                          selectInput("d_categorical1","Choose:", c(demographics_cat_cols),multiple = TRUE),
+                                          hr(),
+                                          selectInput("d_dataInput","Choose dataset here:", c(site_data))
+                                 ),
+                                 tabPanel("Crosstabs",
+                                          div(style = 'overflow-y:scroll;height:500px;',
+                                              verbatimTextOutput("d_crosstab_summary"))
+                                 ),
+                                 tabPanel("Plot", plotOutput("demographics_bar_plot"))
+                                 
+                          )
+                   ),
+                   column(6,
+                          tabBox(height = "600px", width = "250px",
+                                 tabPanel("Variables",
+                                          box(title = "Select numeric here ", status = "primary", solidHeader = T,
+                                              selectInput("demo1", "Choose variable",sort(demographics_num_cols)),
+                                              selectInput("demo2", "Choose variable",sort(group_by)))
+                                          ),
+                                 tabPanel("Missing", tableOutput("d_missing")),
+                                 tabPanel("Not Missing", tableOutput("d_not_missing")),
+                                 tabPanel("Mean", dataTableOutput("d_stats_mean")),
+                                 tabPanel("Median", dataTableOutput("d_stats_median")),
+                                 tabPanel("Summary", verbatimTextOutput("summary_of_selected_demography")),
+                                 tabPanel("Outliers",
+                                          div(style = 'overflow-y:scroll;height:500px;',
+                                              dataTableOutput("d_return_outliers")
+                                          )
+                                 )
+                                 
+                          )
+                          
+                   )
+                 ),
+                 # bottom row
+                 fluidRow(
+                   column(6, 
+                          tabBox(height = "600px",width = "250px",
+                                 tabPanel("Codebook",
+                                          div(style = 'overflow-y:scroll;height:500px;',
+                                              verbatimTextOutput("dCodebook"))
+                                 )
+      
+                                 )
+                          
+                   ),
+                   column(6,
+                          tabBox(height = "600px",width = "250px",
+                                 tabPanel("Plot", plotOutput("plot_demographics"))
+                          )
+                   )
                  )
                  
         ),
@@ -156,10 +213,13 @@ shinyUI(
                    ),
                    column(6,
                           tabBox(height = "600px", width = "250px",
-                                 tabPanel("Variables", uiOutput("measurement_columns")),
+                                 tabPanel("Variables",
+                                          box(title = "Select numeric here ", status = "primary", solidHeader = T,
+                                              selectInput("measure1", "Choose variable",sort(measurements_num_cols)),
+                                              selectInput("measure2", "Choose variable",sort(group_by)))
+                                          ),
                                  tabPanel("Missing", tableOutput("missing")),
                                  tabPanel("Not Missing", tableOutput("not_missing")),
-                                 tabPanel("Plot", plotOutput("plot_measurements")),
                                  tabPanel("Mean", dataTableOutput("stats_mean")),
                                  tabPanel("Median", dataTableOutput("stats_median")),
                                  tabPanel("Summary", verbatimTextOutput("summary_of_selected_measurement")),
@@ -177,12 +237,15 @@ shinyUI(
                  fluidRow(
                    column(6, 
                           tabBox(height = "600px",width = "250px",
-                                 tabPanel("Codebook", "Still under development")
+                                 tabPanel("Codebook",
+                                          div(style = 'overflow-y:scroll;height:500px;',
+                                              verbatimTextOutput("mCodebook"))
+                                          )
                           )
                    ),
                    column(6,
                           tabBox(height = "600px",width = "250px",
-                                 tabPanel("Variable")
+                                 tabPanel("Plot", plotOutput("plot_measurements"))
                           )
                    )
                  )

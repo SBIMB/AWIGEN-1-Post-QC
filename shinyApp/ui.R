@@ -144,14 +144,13 @@ shinyUI(
                                           helpText("Select one or 3 variables here"),
                                           selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE),
                                           hr(),
-                                          selectInput("m_categorical2","Choose:", c(group_by))
+                                          selectInput("dataInput","Choose dataset here:", c(site_data))
                                  ),
                                  tabPanel("Crosstabs",
                                           div(style = 'overflow-y:scroll;height:500px;',
                                               verbatimTextOutput("crosstab_summary"))
                                  ),
-                                 tabPanel("Plot", plotOutput("measurement_bar_plot")),
-                                 tabPanel("Per site")
+                                 tabPanel("Plot", plotOutput("measurement_bar_plot"))
                                  
                           )
                    ),
@@ -178,7 +177,7 @@ shinyUI(
                  fluidRow(
                    column(6, 
                           tabBox(height = "600px",width = "250px",
-                                 tabPanel("Variable", "Still under development")
+                                 tabPanel("Codebook", "Still under development")
                           )
                    ),
                    column(6,

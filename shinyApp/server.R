@@ -36,15 +36,15 @@ shinyServer(
       if(is.null(data()))
         h5("Powered by", tags$img(src='logo.jpg', Height=300, width=300), align = "center")
       else
-       box(title = "Summary", status = "primary", solidHeader = T,
-       renderText(about()))
-      })
+        box(title = "Summary", status = "primary", solidHeader = T,
+            renderText(about()))
+    })
     
     # display columns to select
     output$launch_columns <- renderUI({
       if(is.null(data())){return()}
       box(title = "Select columns", status = "primary", solidHeader = T,
-            selectInput("var", "Choose variable",sort(names(data()))))
+          selectInput("var", "Choose variable",sort(names(data()))))
     })
     
     # show plot for selected column
@@ -65,10 +65,27 @@ shinyServer(
     
     # measurements ___________
     # crosstab section
+    # choose dataset
+    selectedDataset <- reactive({
+      if(is.null(data())){return()}
+      df <- data()
+      site <- "site"
+      switch(input$dataInput,
+             "All" = df,
+             "Agincourt" = df[ which(df[,site] == 1),],
+             "Digkale" = df[ which(df[,site] == 2),],
+             "Nairobi" = df[ which(df[,site] == 3),],
+             "Nanoro" = df[ which(df[,site] == 4),],
+             "Navrongo" =  df[ which(df[,site] == 5),],
+             "Soweto" = df[ which(df[,site] == 6),]
+      )
+    })
+    
     # crostab tables
     output$crosstab_summary <- renderPrint({
       if(is.null(data())){return()}
-      df <- data()
+      
+      df <- selectedDataset()
       selection <- input$m_categorical1
       if (!is.null(selection)) {
         if(length(selection)==1){
@@ -225,7 +242,7 @@ shinyServer(
       # randomly generate the colors to be used in the plot based on the mean categories
       nColors <- nrow(meanForMeasures())
       paletteColors <- distinctColorPalette(nColors)
-
+      
       # define the theme -- static
       theme_prefered <-  theme(
         plot.title = element_text(color="black", size=18),

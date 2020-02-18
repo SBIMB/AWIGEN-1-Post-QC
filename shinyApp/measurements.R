@@ -1,3 +1,8 @@
+# choose dataset
+site_data <- c("All", "Agincourt", "Digkale", "Nairobi", "Nanoro", "Navrongo", "Soweto")
+
+
+# choose numeric variable
 measurements_num_cols <- c("standing_height_qc",
                             "weight_qc",
                             "waist_circumference_qc",
@@ -27,14 +32,23 @@ measurements_num_cols <- c("standing_height_qc",
                             "ur_albumin_qc",
                             "ur_protein_qc")
 
+# choose categorical variable
 measurements_cat_cols <- c("tested_hiv_qc",
                             "hiv_status_qc",
                             "hiv_positive_qc",
                             "hiv_medication_qc",
                             "traditional_med_hiv_qc",
                             "agree_hivtest",
-                            "result_hiv_qc")
+                            "result_hiv_qc",
+                            "menopause_status_c_qc",
+                            "sex")
 
+
+# choose groupby attribute
 group_by <- c("sex",
             "country",
             "site")
+
+
+# refer to the codebook labels
+

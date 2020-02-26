@@ -57,3 +57,15 @@ bar_plot_3 <- function(df, selectedColumn1, selectedColumn2, selectedColumn3){
        col = "black",
        xpd=NA)
 }
+
+# set the theme for the plots
+theme_prefered <-  theme(
+  plot.title = element_text(color="black", size=18),
+  axis.title.x = element_text(color="black", size=18),
+  axis.title.y = element_text(color="black", size=18),
+  axis.text = element_text(color="black", size=16),
+  legend.text = element_text(color="black", size=18),
+  legend.title = element_text(color="black", size=18),
+  panel.background = element_blank(),
+  axis.line = element_line(colour = "black")
+)

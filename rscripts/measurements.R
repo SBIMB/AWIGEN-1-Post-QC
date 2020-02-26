@@ -3,11 +3,11 @@ library(plyr)
 library(readxl)
 
 #import data from imac
-awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
+#awigen <- read.csv("~/Documents/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
 
 # reading data from my pc
-#awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
-
+awigen <- read.csv("~/Development/AWIGEN-1-Post-QC/data/raw/all_sites_v2.5.3.24.csv", header=TRUE)
+colnames(awigen)
 
 # Assign real site names
 site_labels <- c("Agincourt", "Digkale", "Nairobi", "Nanoro", "Navrongo", "Soweto")

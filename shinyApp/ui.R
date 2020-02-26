@@ -4,6 +4,7 @@ library(plotly)
 library(shinyalert)
 source('demographics.R')
 source('measurements.R')
+source('data.R')
 source('tab-modules.R')
 
 shinyUI(
@@ -25,9 +26,10 @@ shinyUI(
       # side bar menu items
       sidebarMenu(
         
+        # data entry window
+        menuItem("Home", tabName = "home"),
         # data here..
-        menuItem("Data", tabName = "imported_data"),
-        
+        menuItem("Data", tabName = "data"),
         # Instruments here ...
         menuItem("Demographic Information", tabName = "demographics"),
         menuItem("Behaviour Lifestyle", tabName = "lifestyle"),
@@ -48,25 +50,69 @@ shinyUI(
     dashboardBody(
       # tab items
       tabItems(
-        # data
-        tabItem( tabName = "imported_data",
-                 fluidRow(style='height:40vh',
-                          column(width=6,
-                                 uiOutput("launch_summary"),
-                                 uiOutput("launch_columns")
-                          ),
-                          column(width=6,
-                                 fluidRow(
-                                   plotOutput("chart_preview")
-                                   
+        tabItem( tabName = "home", div(uiOutput("launch_summary"), align="center")),
+        
+        # data ________________________________________________________________________________________________________
+        tabItem( tabName = "data",
+                 sectionLabels(),
+                 # top row
+                 fluidRow(
+                   
+                   column(6,
+                          tabBox(height = "500px", width = "250px",
+                                 tabPanel("Variables",
+                                          helpText("Select one or 3 variables here"),
+                                          uiOutput("launch_columns"),
+                                          hr(),
+                                          selectInput("a_dataInput","Choose dataset here:", c(site_data))
                                  ),
-                                 fluidRow(
-                                   
-                                   tableOutput("descriptive")
+                                 tabPanel("Crosstabs",
+                                          div(style = 'overflow-y:scroll;height:500px;',
+                                              verbatimTextOutput("a_crosstab_summary"))
+                                 ),
+                                 tabPanel("Plot", plotOutput("a_bar_plot"))
+                                 
+                          )
+                   ),
+                   column(6,
+                          tabBox(height = "500px", width = "250px",
+                                 tabPanel("Variables",
+                                          box(title = "Select numeric here ", status = "primary", solidHeader = T,
+                                              uiOutput("num_columns"),
+                                              selectInput("awigen2", "Choose variable",sort(group_by)))
+                                 ),
+                                 tabPanel("Missing", tableOutput("a_missing")),
+                                 tabPanel("Not Missing", tableOutput("a_not_missing")),
+                                 tabPanel("Mean", dataTableOutput("a_stats_mean")),
+                                 tabPanel("Median", dataTableOutput("a_stats_median")),
+                                 tabPanel("Summary", verbatimTextOutput("summary_of_selected_awigen")),
+                                 tabPanel("Outliers",
+                                          div(style = 'overflow-y:scroll;height:5000px;',
+                                              dataTableOutput("a_return_outliers")
+                                          )
                                  )
                                  
                           )
                           
+                   )
+                 ),
+                 # bottom row
+                 fluidRow(
+                   column(6, 
+                          tabBox(height = "500px",width = "250px",
+                                 tabPanel("Codebook",
+                                          div(style = 'overflow-y:scroll;height:400px;',
+                                              verbatimTextOutput("aCodebook"))
+                                 )
+                                 
+                          )
+                          
+                   ),
+                   column(6,
+                          tabBox(height = "500px",width = "250px",
+                                 tabPanel("Plot", plotOutput("plot_awigen"))
+                          )
+                   )
                  )
                  
         ),
@@ -78,7 +124,7 @@ shinyUI(
                  fluidRow(
                    
                    column(6,
-                          tabBox(height = "600px",width = "250px",
+                          tabBox(height = "500px",width = "250px",
                                  tabPanel("Variables",
                                           helpText("Select one or 3 variables here"),
                                           selectInput("d_categorical1","Choose:", c(demographics_cat_cols),multiple = TRUE),
@@ -94,7 +140,7 @@ shinyUI(
                           )
                    ),
                    column(6,
-                          tabBox(height = "600px", width = "250px",
+                          tabBox(height = "500px", width = "250px",
                                  tabPanel("Variables",
                                           box(title = "Select numeric here ", status = "primary", solidHeader = T,
                                               selectInput("demo1", "Choose variable",sort(demographics_num_cols)),
@@ -118,9 +164,9 @@ shinyUI(
                  # bottom row
                  fluidRow(
                    column(6, 
-                          tabBox(height = "600px",width = "250px",
+                          tabBox(height = "500px",width = "250px",
                                  tabPanel("Codebook",
-                                          div(style = 'overflow-y:scroll;height:500px;',
+                                          div(style = 'overflow-y:scroll;height:400px;',
                                               verbatimTextOutput("dCodebook"))
                                  )
       
@@ -128,7 +174,7 @@ shinyUI(
                           
                    ),
                    column(6,
-                          tabBox(height = "600px",width = "250px",
+                          tabBox(height = "500px",width = "250px",
                                  tabPanel("Plot", plotOutput("plot_demographics"))
                           )
                    )
@@ -136,7 +182,7 @@ shinyUI(
                  
         ),
         
-        # lifestyle
+        # lifestyle ______________________________________________________________________________________
         tabItem( tabName = "lifestyle",
                  sectionLabels(),
                  fluidRow(
@@ -196,7 +242,7 @@ shinyUI(
                  fluidRow(
                    
                    column(6,
-                          tabBox(height = "600px",width = "250px",
+                          tabBox(height = "500px",width = "250px",
                                  tabPanel("Variables",
                                           helpText("Select one or 3 variables here"),
                                           selectInput("m_categorical1","Choose:", c(measurements_cat_cols),multiple = TRUE),
@@ -212,7 +258,7 @@ shinyUI(
                           )
                    ),
                    column(6,
-                          tabBox(height = "600px", width = "250px",
+                          tabBox(height = "500px", width = "250px",
                                  tabPanel("Variables",
                                           box(title = "Select numeric here ", status = "primary", solidHeader = T,
                                               selectInput("measure1", "Choose variable",sort(measurements_num_cols)),
@@ -236,15 +282,15 @@ shinyUI(
                  # bottom row
                  fluidRow(
                    column(6, 
-                          tabBox(height = "600px",width = "250px",
+                          tabBox(height = "500px",width = "250px",
                                  tabPanel("Codebook",
-                                          div(style = 'overflow-y:scroll;height:500px;',
+                                          div(style = 'overflow-y:scroll;height:400px;',
                                               verbatimTextOutput("mCodebook"))
                                           )
                           )
                    ),
                    column(6,
-                          tabBox(height = "600px",width = "250px",
+                          tabBox(height = "500px",width = "250px",
                                  tabPanel("Plot", plotOutput("plot_measurements"))
                           )
                    )

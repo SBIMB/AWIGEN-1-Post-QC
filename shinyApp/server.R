@@ -147,7 +147,6 @@ shinyServer(
       if(is.null(data())){return()}
       df <- data()
       num_col <- input$awigen1
-      #sortbyColumn <- input$awigen2
       df[ which(df[, num_col] == -999), ]
     })
     
@@ -156,7 +155,7 @@ shinyServer(
       if(is.null(data())){return()}
       num_col <- input$awigen1
       sortbyColumn <- input$awigen2
-      as.data.frame(table(d_with_999()[, sortbyColumn], dnn = list(num_col)), responseName = "Count")
+      as.data.frame(table(a_with_999()[, sortbyColumn], dnn = list(num_col)), responseName = "Count")
     })
     
     # measures with no missing values
@@ -173,7 +172,7 @@ shinyServer(
       if(is.null(data())){return()}
       num_col <- input$awigen1
       sortbyColumn <- input$awigen2
-      as.data.frame(table(d_no_999()[, sortbyColumn], dnn = list(num_col)), responseName = "Count")
+      as.data.frame(table(a_no_999()[, sortbyColumn], dnn = list(num_col)), responseName = "Count")
     })
     
     # means for measures
@@ -182,7 +181,7 @@ shinyServer(
       df <- data()
       num_col <- input$awigen1
       sortbyColumn <- input$awigen2
-      data <- do.call("ddply",list(d_no_999(), sortbyColumn, summarize, aw_std.mean = call("mean",as.symbol(num_col),na.rm=TRUE)))
+      data <- do.call("ddply",list(a_no_999(), sortbyColumn, summarize, aw_std.mean = call("mean",as.symbol(num_col),na.rm=TRUE)))
       colnames(data) <- c(num_col, "Mean")
       data
     })
@@ -193,7 +192,7 @@ shinyServer(
       df <- data()
       num_col <- input$awigen1
       sortbyColumn <- input$awigen2
-      data <- do.call("ddply",list(d_no_999(), sortbyColumn, summarize, aw_std.median = call("median",as.symbol(num_col),na.rm=TRUE)))
+      data <- do.call("ddply",list(a_no_999(), sortbyColumn, summarize, aw_std.median = call("median",as.symbol(num_col),na.rm=TRUE)))
       colnames(data) <- c(num_col, "Median")
       data
     })
@@ -210,7 +209,7 @@ shinyServer(
     
     output$summary_of_selected_awigen <- renderPrint({
       if(is.null(data())){return()}
-      df <- d_no_999()
+      df <- a_no_999()
       num_col <- input$awigen1
       #sortbyColumn <- input$demo2
       summary(df[,num_col])
@@ -220,7 +219,7 @@ shinyServer(
     # outliers for measures
     a_outliersForMeasures <- reactive({
       if(is.null(data())){return()}
-      dataf <- d_no_999()
+      dataf <- a_no_999()
       num_col <- input$awigen1
       outliers <- boxplot(dataf[, num_col], plot=FALSE)$out
       dataf[which(dataf[, num_col] %in% outliers),]
@@ -239,7 +238,7 @@ shinyServer(
     # render plot of measurements
     output$plot_awigen <- renderPlot({
       if(is.null(data())){return()}
-      no_999 <- d_no_999()
+      no_999 <- a_no_999()
       num_col <- input$awigen1
       sortbyColumn <- input$awigen2
       

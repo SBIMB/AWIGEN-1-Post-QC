@@ -1,14 +1,3 @@
-# columns for all instruments
-
-# numerical variables
-awigen_num_cols <- c()
-
-
-
-# categorical variables
-awigen_cat_cols <- c()
-
-
-
 # hash map keeping the codebook
+# Still being developed. This file should include all the label names
 awigen_hash <- hash()
